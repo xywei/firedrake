@@ -306,8 +306,8 @@ class _SNESContext(object):
             self.Jp = None
 
         self._assemble_residual = self.create_assembly_callable(self.F,
-                                                           tensor=self._F,
-                                                           form_compiler_parameters=self.fcp)
+                                                                tensor=self._F,
+                                                                form_compiler_parameters=self.fcp)
 
         self._jacobian_assembled = False
         self._splits = {}
@@ -508,4 +508,3 @@ class _SNESContext(object):
     @cached_property
     def _F(self):
         return function.Function(self.F.arguments()[0].function_space())
-
