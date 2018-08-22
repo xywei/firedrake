@@ -282,12 +282,10 @@ class _SNESContext(object):
         if appctx is None:
             appctx = {}
 
-        # if matfree or pmatfree:
-            # A split context will already get the full state.
-            # TODO, a better way of doing this.
-            # Now we don't have a temporary state inside the snes
-            # context we could just require the user to pass in the
-            # full state on the outside.
+        # TODO, a better way of doing this.
+        # Now we don't have a temporary state inside the snes
+        # context we could just require the user to pass in the
+        # full state on the outside.
         appctx.setdefault("state", self._x)
 
         self.appctx = appctx
