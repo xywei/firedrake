@@ -1,11 +1,11 @@
-
+import itertools
 import numpy
 import collections
 
 from ufl import as_vector
 from ufl.classes import Zero
 from ufl.algorithms.map_integrands import map_integrand_dags
-from ufl.corealg.map_dag import MultiFunction
+from ufl.corealg.map_dag import MultiFunction, map_expr_dags
 
 from firedrake.ufl_expr import Argument
 
@@ -129,3 +129,26 @@ def split_form(form):
         if len(f.integrals()) > 0:
             forms.append(SplitForm(indices=idx, form=f))
     return tuple(forms)
+
+
+class HasLiteralValue(MultiFunction):
+    """Does an expression contain a literal value (useful for
+    debugging recompilation of forms)."""
+
+    def terminal(self, op):
+        return False
+
+    def scalar_value(self, op):
+        return True
+
+    def expr(self, op, *operands):
+        return any(operands)
+
+
+def has_literal(form):
+    """Does a form contain any literal values.
+
+    Useful for debugging excessive recompilation.
+
+    :returns: True if there is a literal value, False otherwise"""
+    return any(map_expr_dags(HasLiteralValue(), [i.integrand() for i in form.integrals()]))
