@@ -242,22 +242,6 @@ def test_trivial_projector():
     assert(np.abs(mass1-mass2) < 1.0e-10)
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-@pytest.mark.skip("C Expressions about to be deleted")
-def test_projector_expression():
-    mesh = UnitSquareMesh(2, 2)
-    V = FunctionSpace(mesh, "CG", 1)
-    vo = Function(V)
-    expr = Expression("1")
-    Projector(expr, vo)
-    assert np.allclose(vo.dat.data_ro, 1.0)
-
-
-=======
->>>>>>> regression - projection
-=======
->>>>>>> 0c0404a7e596ee715fbaa17ae22b4478ffd78e67
 @pytest.mark.parametrize('tensor', ['scalar', 'vector', 'tensor'])
 @pytest.mark.parametrize('same_fspace', [False, True])
 def test_projector_bcs(tensor, same_fspace):
