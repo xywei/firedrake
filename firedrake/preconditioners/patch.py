@@ -373,12 +373,11 @@ class PlaneSmoother(object):
         return (patches, iterationSet)
 
 
-class PatchPC(PCBase):
+class PatchBase(PCSNESBase):
 
     needs_python_pmat = False
 
-    def initialize(self, pc):
-        A, P = pc.getOperators()
+    def initialize(self, obj):
 
         if isinstance(obj, PETSc.PC):
             A, P = obj.getOperators()

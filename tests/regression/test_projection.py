@@ -133,7 +133,7 @@ def test_project_mismatched_rank():
     xs = SpatialCoordinate(m)
     ev = xs[0]
     eu = as_vector((xs[0], xs[1]))
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         project(v, U)
     with pytest.raises(ValueError):
         project(u, V)
@@ -243,6 +243,7 @@ def test_trivial_projector():
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 @pytest.mark.skip("C Expressions about to be deleted")
 def test_projector_expression():
     mesh = UnitSquareMesh(2, 2)
@@ -255,6 +256,8 @@ def test_projector_expression():
 
 =======
 >>>>>>> regression - projection
+=======
+>>>>>>> 0c0404a7e596ee715fbaa17ae22b4478ffd78e67
 @pytest.mark.parametrize('tensor', ['scalar', 'vector', 'tensor'])
 @pytest.mark.parametrize('same_fspace', [False, True])
 def test_projector_bcs(tensor, same_fspace):
