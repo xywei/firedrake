@@ -201,15 +201,18 @@ def compile_form(form, name, parameters=None, inverse=False, split=True, interfa
     if split:
         iterable = split_form(form)
     else:
-        iterable = ([(0, )*len(form.arguments()), form], )
+        iterable = ([(None, )*len(form.arguments()), form], )
     for idx, f in iterable:
         f = _real_mangle(f)
         # Map local coefficient numbers (as seen inside the
         # compiler) to the global coefficient numbers
         number_map = dict((n, coefficient_numbers[c])
                           for (n, c) in enumerate(f.coefficients()))
-        kinfos = TSFCKernel(f, name + "".join(map(str, idx)), parameters,
-                            number_map, interface, coffee).kernels
+        if all(i is None for i in idx):
+            prefix = name
+        else:
+            prefix = name + "".join(map(str, idx))
+        kinfos = TSFCKernel(f, prefix, parameters, number_map, interface, coffee).kernels
         for kinfo in kinfos:
             kernels.append(SplitKernel(idx, kinfo))
     kernels = tuple(kernels)

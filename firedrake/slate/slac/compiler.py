@@ -439,7 +439,7 @@ def generate_loopy_kernel(slate_expr, tsfc_parameters=None):
     for tensor in traverse_dags([slate_expr]):
         # TODO: right now, we always make temporaries for everything
         # There is opportunity for optimisation here, based on how the temporary is subsequently used.
-        name = "t{}".format(len(temporaries))
+        name = "t{}".format(len(temporary_variables))
 
         shape = tensor.shape
         if shape == ():

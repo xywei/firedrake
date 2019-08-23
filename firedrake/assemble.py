@@ -225,7 +225,7 @@ def _assemble(f, tensor=None, bcs=None, form_compiler_parameters=None,
         kernels = slac.compile_expression(f, tsfc_parameters=form_compiler_parameters)
         integral_types = [kernel.kinfo.integral_type for kernel in kernels]
     else:
-        kernels = tsfc_interface.compile_form(f, "form", parameters=form_compiler_parameters, inverse=inverse)
+        kernels = tsfc_interface.compile_form(f, "form", split=False, parameters=form_compiler_parameters, inverse=inverse)
         integral_types = [integral.integral_type() for integral in f.integrals()]
 
         if bcs is not None:
@@ -344,22 +344,40 @@ def _assemble(f, tensor=None, bcs=None, form_compiler_parameters=None,
             raise ValueError("BAIJ matrix type makes no sense for mixed spaces, use 'aij'")
 
         def mat(testmap, trialmap, rowbc, colbc, i, j):
-            m = testmap(test.function_space()[i])
-            n = trialmap(trial.function_space()[j])
-            maps = (m if m else None, n if n else None)
-
-            rlgmap, clgmap = tensor[i, j].local_to_global_maps
-            V = test.function_space()[i]
-            rlgmap = V.local_to_global_map(rowbc, lgmap=rlgmap)
-            V = trial.function_space()[j]
-            clgmap = V.local_to_global_map(colbc, lgmap=clgmap)
+            test_space = test.function_space()
+            trial_space = trial.function_space()
+            (rows, cols) = tensor.sparsity.shape
             if rowbc is None:
                 rowbc = []
             if colbc is None:
                 colbc = []
-            unroll = any(bc.function_space().component is not None
-                         for bc in chain(rowbc, colbc) if bc is not None)
-            return tensor[i, j](op2.INC, maps, lgmaps=(rlgmap, clgmap), unroll_map=unroll)
+
+            if i is None and len(rowbc) > 0:
+                raise NotImplementedError("Not yet sorry!")
+            if j is None and len(colbc) > 0:
+                raise NotImplementedError("Not yet sorry!")
+
+            if i is not None:
+                test_space = test_space[i]
+            if j is not None:
+                trial_space = trial_space[j]
+            maps = (testmap(test_space), trialmap(trial_space))
+
+            if i is not None and j is not None:
+                rlgmap, clgmap = tensor[i, j].local_to_global_maps
+                rlgmap = test_space[i].local_to_global_map(filterbc(rowbc, i), lgmap=rlgmap)
+                clgmap = trial_space[j].local_to_global_map(filterbc(colbc, i), lgmap=clgmap)
+                unroll = any(bc.function_space().component is not None
+                             for bc in chain(rowbc, colbc) if bc is not None)
+                tensor_arg = tensor[i, j]
+                kwargs = {"lgmaps": (rlgmap, clgmap),
+                          "unroll_map": unroll}
+            else:
+                kwargs = {}
+                rlgmap = clgmap = None
+                unroll = False
+                tensor_arg = tensor
+            return tensor_arg(op2.INC, maps, **kwargs)
 
         result = lambda: result_matrix
         if allocate_only:
@@ -376,8 +394,12 @@ def _assemble(f, tensor=None, bcs=None, form_compiler_parameters=None,
             zero_tensor_parloop = tensor.zero
 
         def vec(testmap, i):
-            _testmap = testmap(test.function_space()[i])
-            return tensor[i](op2.INC, _testmap if _testmap else None)
+            V = test.function_space()
+            tensor_arg = tensor
+            if i is not None:
+                V = V[i]
+                tensor_arg = tensor[i]
+            return tensor_arg(op2.INC, testmap(V))
         result = lambda: result_function
     else:
         # 0-forms are always scalar
@@ -437,8 +459,12 @@ def _assemble(f, tensor=None, bcs=None, form_compiler_parameters=None,
             if bcs is not None:
                 tsbc = list(bc for bc in chain(*bcs))
                 if result_matrix.block_shape > (1, 1):
-                    trbc = [bc for bc in tsbc if bc.function_space_index() == j and isinstance(bc, DirichletBC)]
-                    tsbc = [bc for bc in tsbc if bc.function_space_index() == i]
+                    if j is None:
+                        trbc = [bc for bc in tsbc if isinstance(bc, DirichletBC)]
+                    else:
+                        trbc = [bc for bc in tsbc if bc.function_space_index() == j and isinstance(bc, DirichletBC)]
+                    if i is not None:
+                        tsbc = [bc for bc in tsbc if bc.function_space_index() == i]
                 else:
                     trbc = [bc for bc in tsbc if isinstance(bc, DirichletBC)]
             else:
