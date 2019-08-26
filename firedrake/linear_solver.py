@@ -51,7 +51,7 @@ class LinearSolver(OptionsManager):
 
         solver_parameters = solving_utils.set_defaults(solver_parameters,
                                                        A.a.arguments(),
-                                                       self.DEFAULT_KSP_PARAMETERS)
+                                                       ksp_defaults=self.DEFAULT_KSP_PARAMETERS)
         self.A = A
         self.comm = A.comm
         self.P = P if P is not None else A

@@ -3,7 +3,6 @@ import numpy
 from itertools import chain
 
 from pyop2 import op2
-import firedrake.functionspaceimpl as fsi
 from firedrake_configuration import get_config
 from firedrake import function, dmhooks
 from firedrake.exceptions import ConvergenceError
@@ -31,23 +30,41 @@ if get_config()["options"]["petsc_int_type"] == "int32":
                               "pc_factor_mat_solver_type": "mumps",
                               "mat_mumps_icntl_14": 200}
 else:
-    # FIXME: which factorisation package to use in int64?
-    DEFAULT_KSP_PARAMETERS = {}
+    DEFAULT_KSP_PARAMETERS = {"mat_type": "aij",
+                              "ksp_type": "preonly",
+                              "pc_type": "lu",
+                              "pc_factor_mat_solver_type": "superlu_dist"}
 
 
-def set_defaults(solver_parameters, arguments, *defaults):
+def set_defaults(solver_parameters, arguments, *, ksp_defaults={}, snes_defaults={}):
     """Set defaults for solver parameters.
 
     :arg solver_parameters: dict of user solver parameters to override/extend defaults
     :arg arguments: arguments for the bilinear form (need to know if we have a Real block).
-    :arg defaults: Any default sets of parameters to supply."""
+    :arg ksp_defaults: Default KSP parameters.
+    :arg snes_defaults: Default SNES parameters."""
     if not (solver_parameters is None or len(solver_parameters) == 0):
-        # User configured something, don't use defaults at all.
+        # User configured something, don't use defaults at all for
+        # KSP, but set SNES defaults if none provided.
         # PETSc will supply some defaults for unset things, but that's
         # fine.
-        return solver_parameters.copy()
+        parameters = solver_parameters.copy()
+        for k, v in snes_defaults.items():
+            parameters.setdefault(k, v)
+        keys = frozenset(parameters.keys())
+        skip = set()
+        if "ksp_type" in keys:
+            skip.update("ksp_type")
+        if "pc_type" in keys:
+            skip.update({"pc_type", "pc_factor_mat_solver_type", "mat_mumps_icntl_14"})
+        if "mat_type" in keys:
+            skip.update({"mat_type", "pc_type", "pc_factor_mat_solver_type", "mat_mumps_icntl_14"})
+        for k, v in ksp_defaults.items():
+            if k not in skip:
+                parameters.setdefault(k, v)
+        return parameters
 
-    parameters = dict(chain.from_iterable(d.items() for d in defaults))
+    parameters = dict(chain.from_iterable(d.items() for d in (ksp_defaults, snes_defaults)))
 
     if any(V.ufl_element().family() == "Real"
            for a in arguments for V in a.function_space()):

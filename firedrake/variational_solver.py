@@ -167,8 +167,8 @@ class NonlinearVariationalSolver(OptionsManager):
 
         solver_parameters = solving_utils.set_defaults(solver_parameters,
                                                        problem.J.arguments(),
-                                                       self.DEFAULT_SNES_PARAMETERS,
-                                                       self.DEFAULT_KSP_PARAMETERS)
+                                                       ksp_defaults=self.DEFAULT_KSP_PARAMETERS,
+                                                       snes_defaults=self.DEFAULT_SNES_PARAMETERS)
         mat_type = solver_parameters.get("mat_type")
         pmat_type = solver_parameters.get("pmat_type")
 
