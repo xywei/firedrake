@@ -61,6 +61,9 @@ def set_defaults(solver_parameters, arguments, *, ksp_defaults={}, snes_defaults
             skip.update({"pc_type", "pc_factor_mat_solver_type", "mat_mumps_icntl_14"})
         if "mat_type" in keys:
             skip.update({"mat_type", "pc_type", "pc_factor_mat_solver_type", "mat_mumps_icntl_14"})
+        if parameters.get("mat_type", "matfree"):
+            # Don't set preonly for matfree
+            skip.update({"ksp_type"})
         for k, v in ksp_defaults.items():
             if k not in skip:
                 parameters.setdefault(k, v)
