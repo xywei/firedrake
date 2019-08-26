@@ -26,12 +26,14 @@ SNESReasons = _make_reasons(PETSc.SNES.ConvergedReason())
 if get_config()["options"]["petsc_int_type"] == "int32":
     DEFAULT_KSP_PARAMETERS = {"mat_type": "aij",
                               "ksp_type": "preonly",
+                              "ksp_rtol": 1e-7,
                               "pc_type": "lu",
                               "pc_factor_mat_solver_type": "mumps",
                               "mat_mumps_icntl_14": 200}
 else:
     DEFAULT_KSP_PARAMETERS = {"mat_type": "aij",
                               "ksp_type": "preonly",
+                              "ksp_rtol": 1e-7,
                               "pc_type": "lu",
                               "pc_factor_mat_solver_type": "superlu_dist"}
 
