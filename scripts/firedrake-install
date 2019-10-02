@@ -708,6 +708,8 @@ def install(package):
         build_and_install_petsc()
     # The following outrageous hack works around the fact that petsc and co. cannot be installed in developer mode.
     elif package not in ["petsc4py/", "slepc/", "slepc4py/"]:
+        if package == "loopy/":
+            run_pip_install(["git+https://github.com/inducer/cgen.git@ae1da38a47dd1f0cc256ffc8949d2b8bd51f1f1b"])
         run_pip_install(["-e", package])
     else:
         run_pip_install(["--ignore-installed", package])
