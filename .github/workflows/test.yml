@@ -1,0 +1,43 @@
+name: Build and test
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+      - name: Install Firedrake
+        env:
+          JENKINS_URL: foo
+        run: |
+          mkdir build
+          cd build
+          python ../scripts/firedrake-install --disable-ssh --minimal-petsc --slepc --documentation-dependencies --install thetis --install gusto --install icepack --install pyadjoint
+      - name: Upload install log
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: "install-log"
+          path: build/firedrake-install.log
+      - name: Test Adjoint
+        run: |
+          . build/firedrake/bin/activate
+          cd build/firedrake/src/pyadjoint
+          pytest -v tests/firedrake_adjoint
+      - name: Test Firedrake
+        run: |
+          . build/firedrake/bin/activate
+          pytest -v tests
+      - name: Test doc build
+        run: |
+          . build/firedrake/bin/activate
+          cd docs
+          make html
