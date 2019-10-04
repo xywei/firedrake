@@ -8,6 +8,8 @@ cimport petsc4py.PETSc as PETSc
 from firedrake.petsc import PETSc
 include "dmplexinc.pxi"
 
+cdef extern from "mpi-compat.h":
+    pass
 
 MAGIC = {2: (22, 3, 2),
          3: (81, 4, 3)}
