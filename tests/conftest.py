@@ -18,11 +18,8 @@ def parallel(item):
     if nprocs < 2:
         raise RuntimeError("Need at least two processes to run parallel test")
 
-    # Only spew tracebacks on rank 0.
     # Run xfailing tests to ensure that errors are reported to calling process
-    call = ["mpiexec", "-n", "1", "python", "-m", "pytest", "--runxfail", "-s", "-q", "%s::%s" % (item.fspath, item.name)]
-    call.extend([":", "-n", "%d" % (nprocs - 1), "python", "-m", "pytest", "--runxfail", "--tb=no", "-q",
-                 "%s::%s" % (item.fspath, item.name)])
+    call = ["mpiexec", "-n", "%d" % nprocs, "python", "-m", "pytest", "--runxfail", "-s", "%s::%s" % (item.fspath, item.name)]
     check_call(call)
 
 
