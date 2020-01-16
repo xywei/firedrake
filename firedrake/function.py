@@ -505,9 +505,9 @@ class Function(ufl.Coefficient):
         :kwarg dont_raise: Do not raise an error if a point is not found.
         :kwarg tolerance: Tolerance to use when checking for points in cell.
         """
-        # Need to ensure data is up-to-date for reading
+        # Ensure data is up-to-date for reading (finished below)
         self.dat.global_to_local_begin(op2.READ)
-        self.dat.global_to_local_end(op2.READ)
+
         from mpi4py import MPI
 
         if args:
@@ -517,6 +517,7 @@ class Function(ufl.Coefficient):
         dont_raise = kwargs.get('dont_raise', False)
 
         tolerance = kwargs.get('tolerance', None)
+        
         # Handle f.at(0.3)
         if not arg.shape:
             arg = arg.reshape(-1)
@@ -524,6 +525,7 @@ class Function(ufl.Coefficient):
         mesh = self.function_space().mesh()
         if mesh.variable_layers:
             raise NotImplementedError("Point evaluation not implemented for variable layers")
+        
         # Immersed not supported
         tdim = mesh.ufl_cell().topological_dimension()
         gdim = mesh.ufl_cell().geometric_dimension()
@@ -537,6 +539,9 @@ class Function(ufl.Coefficient):
             arg = arg.reshape(-1, 1)
         else:
             raise ValueError("Point dimension (%d) does not match geometric dimension (%d)." % (arg.shape[-1], gdim))
+
+        # Finish ensuring data is up-to-date for reading
+        self.dat.global_to_local_end(op2.READ)
 
         # Check if we have got the same points on each process
         root_arg = self.comm.bcast(arg, root=0)
