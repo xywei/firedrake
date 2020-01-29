@@ -172,10 +172,6 @@ def coarsen_function(expr, self, coefficient_mapping=None):
         coefficient_mapping = {}
     new = coefficient_mapping.get(expr)
     if new is None:
-        from firedrake.dmhooks import get_parent
-        # Find potential parental mixed space (which will have an
-        # appctx attached and hence a transfer manager if we're in a
-        # solve)
         V = expr.function_space()
         manager = firedrake.dmhooks.get_transfer_manager(expr.function_space().dm)
         V = self(expr.function_space(), self)
