@@ -1,3 +1,4 @@
+from firedrake_citations import Citations
 from firedrake.preconditioners.base import PCBase, SNESBase, PCSNESBase
 from firedrake.petsc import PETSc
 from firedrake.cython.patchimpl import set_patch_residual, set_patch_jacobian
@@ -26,6 +27,21 @@ from pyop2.codegen.rep2loopy import register_petsc_function
 from pyop2.datatypes import IntType
 
 __all__ = ("PatchPC", "PlaneSmoother", "PatchSNES")
+
+
+Citations().add("Farrell2019pcpatch", """
+@Misc{Farrell:2019b,
+  author =       {Patrick E. Farrell and Matthew G. Knepley and
+                  Lawrence Mitchell and Florian Wechsung},
+  title =        {{PCPATCH: software for the topological construction
+                  of multigrid relaxation methods}},
+  year =         2019,
+  note =         {Submitted to ACM Transactions on Mathematical
+                  Software},
+  eprint =       {1912.08516},
+  archiveprefix ={arXiv},
+  primaryclass = {cs.MS}
+}""")
 
 
 class DenseSparsity(object):
@@ -627,7 +643,7 @@ class PlaneSmoother(object):
 class PatchBase(PCSNESBase):
 
     def initialize(self, obj):
-
+        Citations().register("Farrell2019pcpatch")
         if isinstance(obj, PETSc.PC):
             A, P = obj.getOperators()
         elif isinstance(obj, PETSc.SNES):

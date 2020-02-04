@@ -208,14 +208,19 @@ Citations().add("Mitchell2016", """
 
 Citations().add("Homolya2017", """
 @Misc{Homolya2017,
-  author =        {Mikl\'os Homolya and Lawrence Mitchell and Fabio Luporini and
-                   David A. Ham},
-  title =         {{TSFC: a structure-preserving form compiler}},
-  year =          2017,
-  archiveprefix = {arXiv},
-  eprint =        {1705.03667},
-  primaryclass =  {cs.MS},
-  url =           {http://arxiv.org/abs/1705.003667}
+  author =       {Mikl{\'o}s Homolya and Lawrence Mitchell and Fabio
+                  Luporini and David A. Ham},
+  title =        {{TSFC: a structure-preserving form compiler}},
+  journal =      {SIAM Journal on Scientific Computing},
+  year =         2018,
+  volume =       40,
+  number =       3,
+  pages =        {C401-C428},
+  doi =          {10.1137/17M1130642},
+  archiveprefix ={arXiv},
+  eprint =       {1705.03667},
+  primaryclass = {cs.MS},
+  url =          {http://arxiv.org/abs/1705.003667}
 }
 """)
 
@@ -252,12 +257,13 @@ Citations().add("Homolya2017a", """
 """)
 
 Citations().add("Gibson2018", """
-@Misc{Gibson2018,
+@Article{Gibson2018,
   author =       {Thomas H. Gibson and Lawrence Mitchell and David
                   A. Ham and Colin J. Cotter},
-  title =        {{A domain-specific language for the hybridization
-                  and static condensation of finite element methods}},
-  year =         2018,
+  title =        {{Slate: extending Firedrake's domain-specific abstraction to hybridized solvers for geoscience and beyond}},
+  journal =      {Geoscientific Model Development},
+  note =         {To appear},
+  year =         2020,
   archiveprefix ={arXiv},
   eprint =       {1802.00303},
   primaryclass = {cs.MS},
