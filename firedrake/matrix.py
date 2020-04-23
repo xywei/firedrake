@@ -96,8 +96,7 @@ class Matrix(MatrixBase):
         # sets self._a, self._bcs, and self._mat_type
         super(Matrix, self).__init__(a, bcs, mat_type)
         options_prefix = kwargs.pop("options_prefix")
-        kwargs["mat_type"] = mat_type
-        self.M = op2.Mat(*args, **kwargs)
+        self.M = op2.Mat(*args, mat_type=mat_type, **kwargs)
         self.petscmat = self.M.handle
         self.petscmat.setOptionsPrefix(options_prefix)
         self.mat_type = mat_type
