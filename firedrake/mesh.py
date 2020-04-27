@@ -426,8 +426,6 @@ class MeshTopology(object):
             plex.distribute(overlap=0)
 
         tdim = plex.getDimension()
-        # assume the embedding space is the same as the geometric space
-        gdim = plex.getCoordinateDim()
 
         # Allow empty local meshes on a process
         cStart, cEnd = plex.getHeightStratum(0)  # cells
@@ -440,7 +438,7 @@ class MeshTopology(object):
         nfacets = self.comm.allreduce(nfacets, op=MPI.MAX)
 
         self._grown_halos = False
-        self._ufl_cell = ufl.Cell(_cells[tdim][nfacets], geometric_dimension=gdim)
+        self._ufl_cell = ufl.Cell(_cells[tdim][nfacets])
 
         # A set of weakrefs to meshes that are explicitly labelled as being
         # parallel-compatible for interpolation/projection/supermeshing
@@ -1027,9 +1025,8 @@ class VertexOnlyMeshTopology(MeshTopology):
         self._subsets = {}
 
         tdim = 0
-        gdim = swarm.getCoordinateDim()
 
-        self._ufl_cell = ufl.Cell("vertex", geometric_dimension=gdim)
+        self._ufl_cell = ufl.Cell("vertex")
 
         # A set of weakrefs to meshes that are explicitly labelled as being
         # parallel-compatible for interpolation/projection/supermeshing
