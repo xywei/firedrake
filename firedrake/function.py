@@ -60,9 +60,10 @@ class CoordinatelessFunction(ufl.Coefficient):
             "Can't make a CoordinatelessFunction defined on a " + str(type(function_space))
 
         # build UFL mesh with explicitly created UFL coordinates vector element 
-        # (where, notably, dim = topological_dimension) then build a function 
+        # (where, notably, dim = geometric_dimension) then build a function 
         # space on this mesh.
-        e = ufl.VectorElement("Lagrange", function_space.mesh().ufl_cell(), 1, dim=function_space.mesh().ufl_cell().topological_dimension())
+        gdim = function_space.ufl_element().num_sub_elements() # TODO - May need replacing.
+        e = ufl.VectorElement("Lagrange", function_space.mesh().ufl_cell(), 1, dim=gdim)
         mesh = ufl.Mesh(e)
         V = ufl.FunctionSpace(mesh, function_space.ufl_element())
         ufl.Coefficient.__init__(self, V)
