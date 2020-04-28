@@ -1235,7 +1235,7 @@ if mode == "install" or not args.update_script:
             if missing_packages:
                 apt_install(missing_packages)
 
-        except (subprocess.CalledProcessError, InstallError):
+        except (subprocess.CalledProcessError, InstallError, FileNotFoundError):
             log.info("apt-get not found or disabled. Proceeding on the rash assumption that your compiled dependencies are in place.")
             log.info("Please use the --show-dependencies for more information.")
 
