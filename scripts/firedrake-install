@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python3.6
 import logging
 import platform
 import subprocess
@@ -1257,7 +1257,9 @@ if mode == "install":
     except ImportError:
         with_pip = False
     import venv
-    venv.EnvBuilder(with_pip=with_pip).create(firedrake_env)
+    venv.EnvBuilder(with_pip=with_pip,
+                    system_site_packages=True,
+                    symlinks=True).create(firedrake_env)
     if not with_pip:
         import urllib.request
         log.debug("ensurepip unavailable, bootstrapping pip using get-pip.py")
@@ -1324,7 +1326,7 @@ if mode == "install":
     if jenkins and ci_testing_firedrake:
         check_call(["ln", "-s", "../../../", "firedrake"])
     else:
-        git_clone("git+https://github.com/firedrakeproject/firedrake.git")
+        git_clone("git+https://github.com/xywei/firedrake.git")
 
     # Build the update script as soon as possible so that installation
     # recovery can be attempted if required.
